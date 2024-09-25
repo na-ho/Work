@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 )
 
 func main() {
+	// Start timing the entire process
+	startTime := time.Now()
+
 	// Complex condition example
 	jsonStr := `
-	{
+    {
     "type": "Magento\\SalesRule\\Model\\Rule\\Condition\\Combine",
     "attribute": null,
     "operator": null,
@@ -56,8 +60,12 @@ func main() {
     ]
 }`
 
+	// Measure JSON unmarshaling
+	unmarshalStart := time.Now()
 	var condition Condition
 	err := json.Unmarshal([]byte(jsonStr), &condition)
+	unmarshalDuration := time.Since(unmarshalStart)
+
 	if err != nil {
 		log.Fatalf("Error parsing condition: %v", err)
 	}
@@ -78,12 +86,24 @@ func main() {
 
 	// Initialize and use the validator
 	validator := NewConditionValidator()
+
+	// Measure validation time
+	validateStart := time.Now()
 	isValid, err := validator.Validate(condition, cart)
+	validateDuration := time.Since(validateStart)
+
 	if err != nil {
 		log.Fatalf("Error validating condition: %v", err)
 	}
 
+	// Calculate total execution time
+	totalDuration := time.Since(startTime)
+
 	fmt.Printf("Condition is valid: %v\n", isValid)
+	fmt.Printf("\nPerformance Metrics:\n")
+	fmt.Printf("JSON Unmarshal time: %v\n", unmarshalDuration)
+	fmt.Printf("Validation time: %v\n", validateDuration)
+	fmt.Printf("Total execution time: %v\n", totalDuration)
 
 	// Explain the condition
 	fmt.Println("\nCondition explanation:")
